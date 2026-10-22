@@ -5,7 +5,7 @@ struct ContentView: View {
     @State private var localUser: LoginResponse?
     @State private var email: String = ""
     @State private var password: String = ""
-    @State var isAuthenticated: Bool = false
+    @State private var isAuthenticated = false
     var body: some View {
         VStack(spacing: 20) {
             AsyncImage(url: URL(string: user?.avatarUrl ?? "")) {
@@ -20,9 +20,11 @@ struct ContentView: View {
             
                 .frame(width: 120, height: 120)
             if(!isAuthenticated) {
-                LoginView()
+                LoginView(isAuthenticated: $isAuthenticated,  activeUser: $localUser)	
             } else {
                 Text("Main Screen")
+                    .animation(Animation.linear(duration: 350))
+                Text("Welcome \(localUser?.firstName ?? "")")
             }
             
             
@@ -53,7 +55,7 @@ struct ContentView: View {
         // url session
         
         let (data, response) = try await URLSession.shared.data(from: url)
-        
+        	
         guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
             throw GHError.invalidResponse
         }

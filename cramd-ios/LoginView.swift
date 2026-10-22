@@ -10,7 +10,9 @@ import SwiftUI
 struct LoginView: View {
     @State private var email: String = ""
     @State private var password: String = ""
-    @Bindable var isAuthenticated: Bool = false
+    @State private var loginError: LoginErrorResponse?
+    @Binding var isAuthenticated: Bool
+    @Binding var activeUser: LoginResponse?
     var body: some View {
         VStack(spacing: 32) {
             Label("Cramd", systemImage: "")
@@ -45,12 +47,18 @@ struct LoginView: View {
             }
             
             HStack {
-                
-                Button(action: {
-                    print("username:", $email.wrappedValue)
-                    print("password:", $password.wrappedValue)
-                    self.isAuthenticated = true
-                }) {
+                	
+                Button {
+                    Task {
+                        do {
+                            loginError = nil
+                            activeUser = try await loginUser()
+                            isAuthenticated = true
+                        } catch {
+                            print("Login failed: \(error)")
+                        }
+                    }
+                } label: {
                     Text("LOGIN")
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -62,7 +70,11 @@ struct LoginView: View {
             }
             .padding(.horizontal)
             
+            Text("\(loginError?.error ?? "")")
+                .foregroundColor(Color.red)
+            
             Text("Don't have an account? SIGN UP")
+            
         }
     }
     
@@ -85,15 +97,29 @@ struct LoginView: View {
         
         
         let (data, response) = try await URLSession.shared.data(for: request)
-        
-        print("here")
-        
-        
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw LoginError.invalidResponse
+        }
+        print("Login response status: \(httpResponse.statusCode)")
+
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            let decoder = JSONDecoder()
+            loginError = try decoder.decode(LoginErrorResponse.self, from: data)
+            throw LoginError.requestFailed(statusCode: httpResponse.statusCode)
+        }
+        guard !data.isEmpty else {
+            throw LoginError.emptyResponse
+        }
+
         do {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
-            return try decoder.decode(LoginResponse.self, from: data)
-        } catch {
+            let loginResponse = try decoder.decode(LoginResponse.self, from: data)
+            print("Login response decoded successfully")
+            return loginResponse
+        } catch let error {
+            print("Login response could not be decoded: \(error)")
             throw LoginError.invalidData
         }
     }
@@ -111,12 +137,19 @@ struct LoginResponse : Codable {
     let token: String
 }
 
+struct LoginErrorResponse: Codable {
+    let error: String
+}
+
 enum LoginError: Error {
     case invalidUrl
+    case invalidResponse
+    case requestFailed(statusCode: Int)
+    case emptyResponse
     case invalidData
 }
 
 
 #Preview {
-    LoginView()		
+    LoginView(isAuthenticated: .constant(false), activeUser: .constant(nil))
 }
