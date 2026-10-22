@@ -14,7 +14,8 @@ DerivedData/
 !default.perspectivev3
 
 # User-specific Xcode settings (window layouts, open files, etc.)
-xcuserdata/
+cramd-ios.xcodeproj/xcodeuserdata/
+cramd-ios.xcworkspace/xcuserdata/
 *.xcuserstate
 
 # ==========================================
