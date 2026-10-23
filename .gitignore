@@ -3,6 +3,8 @@
 # ==========================================
 build/
 DerivedData/
+**/xcuserdata/
+**/xcshareddata/
 *.moved-aside
 *.pbxuser
 !default.pbxuser
@@ -14,9 +16,12 @@ DerivedData/
 !default.perspectivev3
 
 # User-specific Xcode settings (window layouts, open files, etc.)
-cramd-ios.xcodeproj/xcodeuserdata/
-cramd-ios.xcworkspace/xcuserdata/
 *.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+*.app
+*.framework
+*.xcarchive
 
 # ==========================================
 # Swift / Objective-C Specific
@@ -25,6 +30,9 @@ cramd-ios.xcworkspace/xcuserdata/
 *.ipa
 *.dSYM
 *.dSYM.zip
+*.swiftmodule
+*.swiftdoc
+*.swiftsourceinfo
 
 # Playgrounds
 timeline.xctimeline
@@ -56,7 +64,6 @@ Carthage/Checkouts/
 ._*
 .vcmd/
 *.swp
-*.lock
 
 # ==========================================
 # CI/CD & Automation (Fastlane)
@@ -65,4 +72,3 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
-
