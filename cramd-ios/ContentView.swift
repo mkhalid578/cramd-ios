@@ -5,7 +5,7 @@ struct ContentView: View {
     @State private var localUser: LoginResponse?
     @State private var email: String = ""
     @State private var password: String = ""
-    @State private var isAuthenticated = false
+    
     var body: some View {
         VStack(spacing: 20) {
             AsyncImage(url: URL(string: user?.avatarUrl ?? "")) {
@@ -19,12 +19,12 @@ struct ContentView: View {
             }
             
                 .frame(width: 120, height: 120)
-            if(!isAuthenticated) {
-                LoginView(isAuthenticated: $isAuthenticated,  activeUser: $localUser)	
+            if(localUser?.token != nil) {
+                CarView(user: $localUser)
+                
+                
             } else {
-                Text("Main Screen")
-                    .animation(Animation.linear(duration: 350))
-                Text("Welcome \(localUser?.firstName ?? "")")
+                LoginView(activeUser: $localUser)
             }
             
             

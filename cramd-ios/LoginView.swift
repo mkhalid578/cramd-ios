@@ -11,7 +11,7 @@ struct LoginView: View {
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var loginError: LoginErrorResponse?
-    @Binding var isAuthenticated: Bool
+    
     @Binding var activeUser: LoginResponse?
     var body: some View {
         VStack(spacing: 32) {
@@ -53,7 +53,6 @@ struct LoginView: View {
                         do {
                             loginError = nil
                             activeUser = try await loginUser()
-                            isAuthenticated = true
                         } catch {
                             print("Login failed: \(error)")
                         }
@@ -66,6 +65,7 @@ struct LoginView: View {
                         .foregroundColor(.white)
                         .cornerRadius(8)
                 }
+                .disabled(password.isEmpty)
         
             }
             .padding(.horizontal)
@@ -79,8 +79,8 @@ struct LoginView: View {
     }
     
     func loginUser() async throws -> LoginResponse {
-        let endpoint = "http://localhost:3000/auth/login"
-        guard let url = URL(string: endpoint) else {
+        let endpoint = ProcessInfo.processInfo.environment["LOGIN_URL"]
+        guard let url = URL(string: endpoint ?? "") else {
             throw LoginError.invalidUrl
         }
         
@@ -151,5 +151,5 @@ enum LoginError: Error {
 
 
 #Preview {
-    LoginView(isAuthenticated: .constant(false), activeUser: .constant(nil))
+    LoginView(activeUser: .constant(nil))
 }
