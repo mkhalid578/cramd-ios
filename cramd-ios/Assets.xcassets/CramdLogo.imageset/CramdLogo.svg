@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 240" role="img" aria-labelledby="title description">
+  <title id="title">CRAMD logo</title>
+  <desc id="description">The word CRAMD, with its M formed from tightly packed suitcases.</desc>
+
+  <defs>
+    <linearGradient id="suitcaseA" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a78bfa"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="suitcaseB" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#f97316"/>
+    </linearGradient>
+    <linearGradient id="suitcaseC" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+    <linearGradient id="letterC" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fb7185"/>
+      <stop offset=".55" stop-color="#e11d48"/>
+      <stop offset="1" stop-color="#9f1239"/>
+    </linearGradient>
+    <linearGradient id="letterR" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#60a5fa"/>
+      <stop offset=".55" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#1e3a8a"/>
+    </linearGradient>
+    <linearGradient id="letterA" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fcd34d"/>
+      <stop offset=".55" stop-color="#f59e0b"/>
+      <stop offset="1" stop-color="#b45309"/>
+    </linearGradient>
+    <linearGradient id="letterD" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4ade80"/>
+      <stop offset=".55" stop-color="#16a34a"/>
+      <stop offset="1" stop-color="#166534"/>
+    </linearGradient>
+  </defs>
+
+  <text x="24" y="184" fill="url(#letterC)" stroke="#701a3c" stroke-width="3" paint-order="stroke"
+        font-family="Arial Rounded MT Bold, Trebuchet MS, Comic Sans MS, sans-serif" font-size="142" font-weight="900" letter-spacing="-5">C</text>
+  <text x="123" y="184" fill="url(#letterR)" stroke="#172554" stroke-width="3" paint-order="stroke"
+        font-family="Arial Rounded MT Bold, Trebuchet MS, Comic Sans MS, sans-serif" font-size="142" font-weight="900" letter-spacing="-5">R</text>
+  <text x="225" y="184" fill="url(#letterA)" stroke="#78350f" stroke-width="3" paint-order="stroke"
+        font-family="Arial Rounded MT Bold, Trebuchet MS, Comic Sans MS, sans-serif" font-size="142" font-weight="900" letter-spacing="-5">A</text>
+
+  <g transform="translate(386 120)">
+    <rect x="-17" y="-52" width="34" height="104" rx="8" fill="url(#suitcaseA)" stroke="#312e81" stroke-width="3"/>
+    <path d="M-7-52v-5a5 5 0 0 1 5-5h5a5 5 0 0 1 5 5v5" fill="none" stroke="#312e81" stroke-width="4"/>
+    <path d="M-10-39v77M10-39v77" stroke="#ddd6fe" stroke-width="2"/>
+    <rect x="-3" y="-5" width="6" height="11" rx="2" fill="#fef3c7"/>
+  </g>
+  <g transform="translate(431 110) rotate(-25)">
+    <path d="M-15-48c-8-9-9-16-4-24l8 7 7-16 8 15 10-8c6 9 4 18-3 26Z" fill="#34d399" stroke="#92400e" stroke-linejoin="round" stroke-width="2"/>
+    <path d="M-9-49c-4-11-2-18 4-26l7 12 8-9c5 8 5 16 0 23Z" fill="#f472b6" stroke="#9d174d" stroke-linejoin="round" stroke-width="2"/>
+    <path d="M-21-49c-1-5 1-9 5-12m24 12c1-5-1-9-5-12" fill="none" stroke="#92400e" stroke-linecap="round" stroke-width="3"/>
+    <path d="M-20-49Q-23-53-20-57L-18-61Q0-66 18-61L20-57Q23-53 20-49L22 43Q22 53 12 53H-12Q-22 53-22 43Z" fill="url(#suitcaseB)" stroke="#92400e" stroke-width="3"/>
+    <path d="M-10-45v89M10-45v89" stroke="#ffedd5" stroke-width="2"/>
+    <rect x="-3" y="-5" width="6" height="11" rx="2" fill="#fff7ed"/>
+  </g>
+  <g transform="translate(481 110) rotate(25)">
+    <path d="M-19-52Q-23-49-23-41V41Q-23 53-12 53H12Q23 53 23 41V-41Q23-52 19-52Z" fill="url(#suitcaseC)" stroke="#134e4a" stroke-width="3"/>
+    <path d="M-7-52v-5a5 5 0 0 1 5-5h5a5 5 0 0 1 5 5v5" fill="none" stroke="#134e4a" stroke-width="4"/>
+    <path d="M-10-39v77M10-39v77" stroke="#ccfbf1" stroke-width="2"/>
+    <rect x="-3" y="-5" width="6" height="11" rx="2" fill="#f0fdfa"/>
+  </g>
+  <g transform="translate(526 120)">
+    <rect x="-17" y="-52" width="34" height="104" rx="8" fill="url(#suitcaseA)" stroke="#312e81" stroke-width="3"/>
+    <path d="M-7-52v-5a5 5 0 0 1 5-5h5a5 5 0 0 1 5 5v5" fill="none" stroke="#312e81" stroke-width="4"/>
+    <path d="M-10-39v77M10-39v77" stroke="#ddd6fe" stroke-width="2"/>
+    <rect x="-3" y="-5" width="6" height="11" rx="2" fill="#fef3c7"/>
+  </g>
+
+  <text x="565" y="184" fill="url(#letterD)" stroke="#14532d" stroke-width="3" paint-order="stroke"
+        font-family="Arial Rounded MT Bold, Trebuchet MS, Comic Sans MS, sans-serif" font-size="142" font-weight="900" letter-spacing="-5">D</text>
+</svg>

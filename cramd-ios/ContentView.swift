@@ -8,17 +8,22 @@ struct ContentView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            AsyncImage(url: URL(string: user?.avatarUrl ?? "")) {
-                image in image
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .clipShape(Circle())
-            } placeholder: {
-                Circle()
-                    .foregroundColor(.secondary)
-            }
+//            AsyncImage(url: URL(string: user?.avatarUrl ?? "")) {
+//                image in image
+//                    .resizable()
+//                    .aspectRatio(contentMode: .fit)
+//                    .clipShape(Circle())
+//            } placeholder: {
+//                Circle()
+//                    .foregroundColor(.secondary)
+//            }
+//            
+//                .frame(width: 120, height: 120)
             
-                .frame(width: 120, height: 120)
+            Image("Logo")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 240, height: 240)
             if(localUser?.token != nil) {
                 CarView(user: $localUser)
                 

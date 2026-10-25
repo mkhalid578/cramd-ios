@@ -11,40 +11,25 @@ struct LoginView: View {
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var loginError: LoginErrorResponse?
+    @State private var showSignup = false
     
     @Binding var activeUser: LoginResponse?
     var body: some View {
-        VStack(spacing: 32) {
-            Label("Cramd", systemImage: "")
+        VStack(spacing: 16) {
             
-            TextField("Username or email", text: $email)
-                .font(.body)
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-                .autocorrectionDisabled(true)
-                .textInputAutocapitalization(.never)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.purple, lineWidth: 1)
-                )
-                .padding(.horizontal)
-            VStack (spacing: 8) {
-                SecureField("Password", text: $password)
-                    .font(.body)
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                    .overlay (
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.purple, lineWidth: 1)
-                    )
-                    .padding(.horizontal)
+            VStack(spacing: 16) {
+                CustomTextField(placeholder: "Email Address", text: $email, isSecure: false)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
+                
+                CustomTextField(placeholder: "Password", text: $password, isSecure: true)
                 Text("Forgot password?")
                     .font(.subheadline)
                     .frame(maxWidth: 352, alignment: .trailing)
-
+                
+        
             }
+            .padding(.horizontal)
             
             HStack {
                 	
@@ -73,8 +58,19 @@ struct LoginView: View {
             Text("\(loginError?.error ?? "")")
                 .foregroundColor(Color.red)
             
-            Text("Don't have an account? SIGN UP")
             
+            Button (action: {showSignup = true}) {
+                Text("Don't have an account? Sign up")
+                    .font(.headline)
+                
+            }
+            .padding(.horizontal, 40)
+            
+        }
+        .sheet(isPresented: $showSignup) {
+            RegisterPopup()
+                .presentationDetents([.fraction(0.65), .large])
+                .presentationDragIndicator(.visible)
         }
     }
     

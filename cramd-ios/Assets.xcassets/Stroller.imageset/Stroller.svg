@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Stroller</title>
+  <path d="M15 12h8l6 27h23" fill="none" stroke="#334155" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"/>
+  <path d="M24 17h25c1 12-6 19-17 21l-5-2-5-19Z" fill="#a78bfa" stroke="#5b21b6" stroke-linejoin="round" stroke-width="3"/>
+  <path d="M24 17c2-7 8-11 16-11 6 0 11 3 14 8l-5 3H24Z" fill="#f472b6" stroke="#9d174d" stroke-linejoin="round" stroke-width="3"/>
+  <path d="m31 39-7 10m27-10 5 10" fill="none" stroke="#334155" stroke-linecap="round" stroke-width="4"/>
+  <circle cx="22" cy="53" r="6" fill="#334155"/>
+  <circle cx="57" cy="53" r="6" fill="#334155"/>
+</svg>

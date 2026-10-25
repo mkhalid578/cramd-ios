@@ -34,6 +34,9 @@ struct CarView: View {
                 .frame(maxWidth: .infinity)
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
+                .onTapGesture {
+                    print("\(car.model)")
+                }
             }
             .listStyle(.plain)
             .navigationTitle("Store Items")
