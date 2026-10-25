@@ -9,7 +9,9 @@ import SwiftUI
 
 struct CarView: View {
     @Binding var user: LoginResponse?
+    @State var isCarSelected: Bool = false
     @State private var cars: [Car]?
+    @State var selectedCar: Car?
 
     var body: some View {
         NavigationStack {
@@ -35,6 +37,8 @@ struct CarView: View {
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
                 .onTapGesture {
+                    isCarSelected = true
+                    selectedCar = car
                     print("\(car.model)")
                 }
             }
@@ -47,6 +51,11 @@ struct CarView: View {
                     print("Failed to load cars: \(error)")
                 }
             }
+        }
+        .sheet(isPresented: $isCarSelected) {
+            CarPopup(car: $selectedCar )
+                .presentationDetents([.fraction(0.65), .large])
+                .presentationDragIndicator(.visible)
         }
     }
 
@@ -85,7 +94,7 @@ struct CarView: View {
 }
 
 #Preview {
-    CarView(user: .constant(nil))
+    CarView(user: .constant(nil), isCarSelected: false)
 }
 
 struct Car: Codable, Identifiable{
