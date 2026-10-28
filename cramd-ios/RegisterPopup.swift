@@ -9,19 +9,23 @@ import SwiftUI
 
 struct RegisterPopup: View {
     @Environment(\.dismiss) var dismiss
-    
+
     // Form Inputs
     @State private var email = ""
     @State private var firstName = ""
     @State private var lastName = ""
     @State private var password = ""
     @State private var confirmPassword = ""
-    
+
     // Computed property to validate inputs
     private var isFormValid: Bool {
-        !email.isEmpty && !password.isEmpty && password == confirmPassword && password.count >= 6
+        !email.isEmpty && !password.isEmpty && password == confirmPassword
+            && password.count >= 6
     }
-    
+
+    @State private var successMsg: String = ""
+    @State private var success : Bool = false
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
@@ -29,38 +33,64 @@ struct RegisterPopup: View {
                     .font(.title)
                     .bold()
                     .padding(.top)
-                
+
                 // Form Fields
                 VStack(spacing: 16) {
-                    CustomTextField(placeholder: "First Name", text: $firstName, isSecure: false)
-                        .textContentType(.givenName)
-                        .autocapitalization(.none)
-                    
-                    CustomTextField(placeholder: "Last Name", text: $lastName, isSecure: false)
-                        .textContentType(.familyName)
-                        .autocapitalization(.none)
-                    
-                    
-                    CustomTextField(placeholder: "Email Address", text: $email, isSecure: false)
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
-                    
-                    CustomTextField(placeholder: "Password (min 6 chars)", text: $password, isSecure: true)
-                        .textContentType(.newPassword)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                    CustomTextField(placeholder: "Confirm Password", text: $confirmPassword, isSecure: true)
-                        .textContentType(.newPassword)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
+                    CustomTextField(
+                        placeholder: "First Name",
+                        text: $firstName,
+                        isSecure: false
+                    )
+                    .textContentType(.givenName)
+                    .autocapitalization(.none)
+
+                    CustomTextField(
+                        placeholder: "Last Name",
+                        text: $lastName,
+                        isSecure: false
+                    )
+                    .textContentType(.familyName)
+                    .autocapitalization(.none)
+
+                    CustomTextField(
+                        placeholder: "Email Address",
+                        text: $email,
+                        isSecure: false
+                    )
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none)
+
+                    CustomTextField(
+                        placeholder: "Password (min 6 chars)",
+                        text: $password,
+                        isSecure: true
+                    )
+                    .textContentType(.newPassword)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    CustomTextField(
+                        placeholder: "Confirm Password",
+                        text: $confirmPassword,
+                        isSecure: true
+                    )
+                    .textContentType(.newPassword)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
                 }
                 .padding(.horizontal)
-                
+
                 // Submit Button
                 Button(action: {
-                    // Handle sign up logic here
-                    print("Registering user with email: \(email)")
-                    dismiss() // Automatically dismisses the popup on success
+                    
+                    Task {
+                        do {
+                            success = try await registerUser()
+                            dismiss()  // Automatically dismisses the popup on success
+                            successMsg = "Registration Successful"
+                        } catch {
+                            successMsg = "Registration Failed : \(error)"
+                        }
+                    }
                 }) {
                     Text("Register")
                         .font(.headline)
@@ -69,13 +99,22 @@ struct RegisterPopup: View {
                         .padding()
                         .background(isFormValid ? Color.blue : Color.gray)
                         .cornerRadius(10)
+
                 }
                 .disabled(!isFormValid)
                 .padding(.horizontal)
                 .padding(.top, 10)
                 
+                Text (successMsg)
+                    .font(.headline)
+                    .foregroundColor(success ? .green : .red)
+                    .frame(maxWidth: .infinity, maxHeight: 64)
+                    .cornerRadius(8)
+                    .padding()
+
                 Spacer()
             }
+
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Cancel") {
@@ -85,57 +124,50 @@ struct RegisterPopup: View {
             }
         }
     }
-    
-    func registerUser() async throws -> LoginResponse {
+
+    func registerUser() async throws -> Bool {
         let endpoint = ProcessInfo.processInfo.environment["REGISTER_URL"]
         guard let url = URL(string: endpoint ?? "") else {
             throw LoginError.invalidUrl
         }
-        
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
 
-            let encoder = JSONEncoder()
+        let encoder = JSONEncoder()
+        encoder.keyEncodingStrategy = .convertToSnakeCase
         let loginData = try encoder.encode(
             RegisterUser(
                 firstName: firstName,
                 lastName: lastName,
                 email: email,
-                password: password)
+                password: password
+            )
         )
-        
+
         request.httpBody = loginData
-        
-        
+
         let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw LoginError.invalidResponse
+            throw RegisterError.invalidResponse
         }
         print("Login response status: \(httpResponse.statusCode)")
 
         guard (200..<300).contains(httpResponse.statusCode) else {
             let decoder = JSONDecoder()
-            loginError = try decoder.decode(LoginErrorResponse.self, from: data)
-            throw LoginError.requestFailed(statusCode: httpResponse.statusCode)
+            let loginError = try decoder.decode(RegisterUser.self, from: data)
+            print(response)
+            throw RegisterError.requestFailed(
+                statusCode: httpResponse.statusCode
+            )
         }
         guard !data.isEmpty else {
-            throw LoginError.emptyResponse
+            throw RegisterError.emptyResponse
         }
 
-        do {
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            let loginResponse = try decoder.decode(LoginResponse.self, from: data)
-            print("Login response decoded successfully")
-            return loginResponse
-        } catch let error {
-            print("Login response could not be decoded: \(error)")
-            throw LoginError.invalidData
-        }
+        return true
     }
 }
 
@@ -144,7 +176,7 @@ struct CustomTextField: View {
     var placeholder: String
     @Binding var text: String
     var isSecure: Bool
-    
+
     var body: some View {
         Group {
             if isSecure {
@@ -163,13 +195,20 @@ struct CustomTextField: View {
     }
 }
 
-
-
-struct RegisterUser : Codable {
+struct RegisterUser: Codable {
     let firstName: String?
     let lastName: String?
     let email: String?
     let password: String?
+}
+
+enum RegisterError: Error {
+    case invalidUrl
+    case invalidResponse
+    case requestFailed(statusCode: Int)
+    case emptyResponse
+    case invalidData
+
 }
 
 #Preview {
