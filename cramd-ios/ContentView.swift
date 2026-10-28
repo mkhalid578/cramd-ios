@@ -7,7 +7,7 @@ struct ContentView: View {
     @State private var password: String = ""
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 8) {
 //            AsyncImage(url: URL(string: user?.avatarUrl ?? "")) {
 //                image in image
 //                    .resizable()
@@ -20,10 +20,9 @@ struct ContentView: View {
 //            
 //                .frame(width: 120, height: 120)
             
-            Image("Logo")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 240, height: 240)
+            
+            
+          
             if(localUser?.token != nil) {
                 CarView(user: $localUser)
                 

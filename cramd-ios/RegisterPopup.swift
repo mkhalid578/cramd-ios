@@ -85,6 +85,58 @@ struct RegisterPopup: View {
             }
         }
     }
+    
+    func registerUser() async throws -> LoginResponse {
+        let endpoint = ProcessInfo.processInfo.environment["REGISTER_URL"]
+        guard let url = URL(string: endpoint ?? "") else {
+            throw LoginError.invalidUrl
+        }
+        
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+
+            let encoder = JSONEncoder()
+        let loginData = try encoder.encode(
+            RegisterUser(
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                password: password)
+        )
+        
+        request.httpBody = loginData
+        
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw LoginError.invalidResponse
+        }
+        print("Login response status: \(httpResponse.statusCode)")
+
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            let decoder = JSONDecoder()
+            loginError = try decoder.decode(LoginErrorResponse.self, from: data)
+            throw LoginError.requestFailed(statusCode: httpResponse.statusCode)
+        }
+        guard !data.isEmpty else {
+            throw LoginError.emptyResponse
+        }
+
+        do {
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            let loginResponse = try decoder.decode(LoginResponse.self, from: data)
+            print("Login response decoded successfully")
+            return loginResponse
+        } catch let error {
+            print("Login response could not be decoded: \(error)")
+            throw LoginError.invalidData
+        }
+    }
 }
 
 // MARK: - Reusable Custom Input Component
@@ -109,6 +161,15 @@ struct CustomTextField: View {
                 .stroke(Color(.systemGray4), lineWidth: 1)
         )
     }
+}
+
+
+
+struct RegisterUser : Codable {
+    let firstName: String?
+    let lastName: String?
+    let email: String?
+    let password: String?
 }
 
 #Preview {

@@ -16,7 +16,10 @@ struct LoginView: View {
     @Binding var activeUser: LoginResponse?
     var body: some View {
         VStack(spacing: 16) {
-            
+            Image("Logo")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 120, height: 120)
             VStack(spacing: 16) {
                 CustomTextField(placeholder: "Email Address", text: $email, isSecure: false)
                     .keyboardType(.emailAddress)

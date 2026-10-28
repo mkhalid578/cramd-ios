@@ -15,6 +15,9 @@ struct CarView: View {
 
     var body: some View {
         NavigationStack {
+            
+            UserBar(user: $user)
+            
             List(cars ?? []) { car in
                 HStack(spacing: 12) {
                     VStack(alignment: .leading, spacing: 6) {
@@ -43,12 +46,18 @@ struct CarView: View {
                 }
             }
             .listStyle(.plain)
-            .navigationTitle("Store Items")
+            .navigationTitle("Cars")
             .task {
                 do {
                     cars = try await getCars()
                 } catch {
                     print("Failed to load cars: \(error)")
+                }
+            }
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Cancel") {
                 }
             }
         }
