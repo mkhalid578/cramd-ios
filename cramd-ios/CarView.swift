@@ -14,9 +14,11 @@ struct CarView: View {
     @State var selectedCar: Car?
 
     var body: some View {
+        UserBar(user: $user)
+        
         NavigationStack {
             
-            UserBar(user: $user)
+            
             
             List(cars ?? []) { car in
                 HStack(spacing: 12) {

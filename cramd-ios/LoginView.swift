@@ -10,10 +10,11 @@ import SwiftUI
 struct LoginView: View {
     @State private var email: String = ""
     @State private var password: String = ""
-    @State private var loginError: LoginErrorResponse?
-    @State private var showSignup = false
-    
+
+    let authService: AuthService
     @Binding var activeUser: LoginResponse?
+    @State private var showSignup = false
+
     var body: some View {
         VStack(spacing: 16) {
             Image("Logo")
@@ -21,26 +22,35 @@ struct LoginView: View {
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 120, height: 120)
             VStack(spacing: 16) {
-                CustomTextField(placeholder: "Email Address", text: $email, isSecure: false)
-                    .keyboardType(.emailAddress)
-                    .autocapitalization(.none)
-                
-                CustomTextField(placeholder: "Password", text: $password, isSecure: true)
+                CustomTextField(
+                    placeholder: "Email Address",
+                    text: $email,
+                    isSecure: false
+                )
+                .keyboardType(.emailAddress)
+                .autocapitalization(.none)
+
+                CustomTextField(
+                    placeholder: "Password",
+                    text: $password,
+                    isSecure: true
+                )
                 Text("Forgot password?")
                     .font(.subheadline)
                     .frame(maxWidth: 352, alignment: .trailing)
-                
-        
+
             }
             .padding(.horizontal)
-            
+
             HStack {
-                	
+
                 Button {
                     Task {
                         do {
-                            loginError = nil
-                            activeUser = try await loginUser()
+                            activeUser = try await authService.login(
+                                email: email,
+                                password: password
+                            )
                         } catch {
                             print("Login failed: \(error)")
                         }
@@ -54,21 +64,21 @@ struct LoginView: View {
                         .cornerRadius(8)
                 }
                 .disabled(password.isEmpty)
-        
+
             }
             .padding(.horizontal)
-            
-            Text("\(loginError?.error ?? "")")
-                .foregroundColor(Color.red)
-            
-            
-            Button (action: {showSignup = true}) {
+
+            //            Text("\(authService. ?? "")")
+            //                .foregroundColor(Color.red)
+            // @TODO add error msg to auth service
+
+            Button(action: { showSignup = true }) {
                 Text("Don't have an account? Sign up")
                     .font(.headline)
-                
+
             }
             .padding(.horizontal, 40)
-            
+
         }
         .sheet(isPresented: $showSignup) {
             RegisterPopup()
@@ -76,79 +86,12 @@ struct LoginView: View {
                 .presentationDragIndicator(.visible)
         }
     }
-    
-    func loginUser() async throws -> LoginResponse {
-        let endpoint = ProcessInfo.processInfo.environment["LOGIN_URL"]
-        guard let url = URL(string: endpoint ?? "") else {
-            throw LoginError.invalidUrl
-        }
-        
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
 
-            let encoder = JSONEncoder()
-            let loginData = try encoder.encode(LoginUser(email: email, password: password))
-        
-        request.httpBody = loginData
-        
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw LoginError.invalidResponse
-        }
-        print("Login response status: \(httpResponse.statusCode)")
-
-        guard (200..<300).contains(httpResponse.statusCode) else {
-            let decoder = JSONDecoder()
-            loginError = try decoder.decode(LoginErrorResponse.self, from: data)
-            throw LoginError.requestFailed(statusCode: httpResponse.statusCode)
-        }
-        guard !data.isEmpty else {
-            throw LoginError.emptyResponse
-        }
-
-        do {
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            let loginResponse = try decoder.decode(LoginResponse.self, from: data)
-            print("Login response decoded successfully")
-            return loginResponse
-        } catch let error {
-            print("Login response could not be decoded: \(error)")
-            throw LoginError.invalidData
-        }
-    }
 }
-
-struct LoginUser : Codable {
-    let email: String
-    let password: String
-}
-
-struct LoginResponse : Codable {
-    let email: String
-    let firstName: String
-    let lastName: String
-    let token: String
-}
-
-struct LoginErrorResponse: Codable {
-    let error: String
-}
-
-enum LoginError: Error {
-    case invalidUrl
-    case invalidResponse
-    case requestFailed(statusCode: Int)
-    case emptyResponse
-    case invalidData
-}
-
 
 #Preview {
-    LoginView(activeUser: .constant(nil))
+    LoginView(
+        authService: AuthService(baseURL: URL(string: "http://localhost:3000")!),
+        activeUser: .constant(nil)
+    )
 }
