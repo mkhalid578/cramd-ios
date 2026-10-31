@@ -72,7 +72,11 @@ struct CarView: View {
 
 #Preview {
     CarView(
-        carService: CarService(baseURL: URL(string: "http://localhost:3000")!),
+        carService: CarService(
+            client: Client(
+                baseURL: URL(string: "http://localhost:3000")!
+            )
+        ),
         user: .constant(nil),
         isCarSelected: false,
     )

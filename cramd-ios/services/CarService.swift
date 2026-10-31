@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Car: Codable, Identifiable{
+struct Car: Codable, Identifiable {
     let id: Int
     let make: String
     let model: String
@@ -28,14 +28,9 @@ enum CarError: Error {
     case invalidData
 }
 
-@MainActor	
-final class CarService {
-    private var client: Client
-    
-    init(baseURL: URL) {
-        self.client = Client(baseURL: baseURL)
-    }
-    
+struct CarService {
+    let client: Client
+
     func getCars() async throws -> [Car] {
         try await client.get(path: ["cars"])
     }

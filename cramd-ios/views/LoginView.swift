@@ -81,7 +81,7 @@ struct LoginView: View {
 
         }
         .sheet(isPresented: $showSignup) {
-            RegisterPopup()
+            RegisterPopup(auth: authService)
                 .presentationDetents([.fraction(0.65), .large])
                 .presentationDragIndicator(.visible)
         }
@@ -91,7 +91,7 @@ struct LoginView: View {
 
 #Preview {
     LoginView(
-        authService: AuthService(baseURL: URL(string: "http://localhost:3000")!),
+        authService: AuthService(client: Client(baseURL: URL(string: "http://localhost:3000")!)),
         activeUser: .constant(nil)
     )
 }
