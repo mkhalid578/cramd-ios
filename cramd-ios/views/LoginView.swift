@@ -11,7 +11,7 @@ struct LoginView: View {
     @State private var email: String = ""
     @State private var password: String = ""
 
-    let authService: AuthService
+    var authService: AuthService
     @Binding var activeUser: LoginResponse?
     @State private var showSignup = false
 

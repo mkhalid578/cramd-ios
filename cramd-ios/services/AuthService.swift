@@ -7,15 +7,23 @@
 
 import Foundation
 
-struct AuthService {
-    let baseURL: URL
+@MainActor
+final class AuthService {
+    private var client: Client
+
+    init(baseURL: URL) {
+        self.client = Client(baseURL: baseURL)
+    }
 
     func login(email: String, password: String) async throws -> LoginResponse {
-        try await post(
+        let response: LoginResponse = try await client.post(
             path: ["auth", "login"],
             body: LoginRequest(email: email, password: password)
         )
+        client.setToken(token: response.token ?? "")
+        return response
     }
+    
 
     func register(
         email: String,
@@ -23,7 +31,7 @@ struct AuthService {
         lastName: String,
         password: String
     ) async throws -> RegisterResponse {
-        try await post(
+        try await client.post(
             path: ["auth", "register"],
             body: RegisterRequest(
                 email: email,
@@ -32,29 +40,6 @@ struct AuthService {
                 password: password
             )
         )
-    }
-
-    private func post<Body: Encodable, Response: Decodable>(
-        path: [String],
-        body: Body
-    ) async throws -> Response {
-        let url = path.reduce(baseURL) { $0.appendingPathComponent($1) }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.httpBody = try JSONEncoder().encode(body)
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw AuthError.invalidResponse
-        }
-        guard (200..<300).contains(httpResponse.statusCode) else {
-            throw AuthError.requestFailed(statusCode: httpResponse.statusCode)
-        }
-
-        return try JSONDecoder().decode(Response.self, from: data)
     }
 }
 

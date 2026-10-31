@@ -10,6 +10,10 @@ struct ContentView: View {
         baseURL: URL(string: "http://localhost:3000")!
     )
 
+    private let carService = CarService(
+        baseURL: URL(string: "http://localhost:3000")!
+    )
+
     var body: some View {
         VStack(spacing: 8) {
             //            AsyncImage(url: URL(string: user?.avatarUrl ?? "")) {
@@ -25,7 +29,10 @@ struct ContentView: View {
             //                .frame(width: 120, height: 120)
 
             if localUser?.token != nil {
-                CarView(user: $localUser)
+                CarView(
+                    carService: carService,
+                    user: $localUser
+                )
 
             } else {
                 LoginView(authService: authService, activeUser: $localUser)
