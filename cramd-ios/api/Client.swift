@@ -5,17 +5,20 @@
 //  Created by Muhammed Khalid on 10/30/26.
 //
 import Foundation
-	
-struct Client {
+
+actor Client {
+
+    private let baseURL: URL
+    private var token: String?
     
-    let baseURL: URL
-    var token: String = ""
-    //@TODO get()
-    
-    mutating func setToken(token: String) {
+    init(baseURL: URL) {
+        self.baseURL = baseURL
+    }
+
+    func setToken(token: String?) {
         self.token = token
-    }	
-    
+    }
+
     func post<Body: Encodable, Response: Decodable>(
         path: [String],
         body: Body
@@ -25,9 +28,14 @@ struct Client {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        if (!token.isEmpty) {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        if let token {
+            request.setValue(
+                "Bearer \(token)",
+                forHTTPHeaderField: "Authorization"
+            )
         }
+
         request.httpBody = try JSONEncoder().encode(body)
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -41,7 +49,7 @@ struct Client {
 
         return try JSONDecoder().decode(Response.self, from: data)
     }
-    
+
     func get<Response: Decodable>(
         path: [String]
     ) async throws -> Response {
@@ -50,8 +58,12 @@ struct Client {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        if (!token.isEmpty) {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        if let token {
+            request.setValue(
+                "Bearer \(token)",
+                forHTTPHeaderField: "Authorization"
+            )
         }
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -62,9 +74,10 @@ struct Client {
         guard (200..<300).contains(httpResponse.statusCode) else {
             throw AuthError.requestFailed(statusCode: httpResponse.statusCode)
         }
-        
+
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         return try decoder.decode(Response.self, from: data)
-    }}
+    }
+}

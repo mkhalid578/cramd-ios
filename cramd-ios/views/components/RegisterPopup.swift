@@ -9,23 +9,25 @@ import SwiftUI
 
 struct RegisterPopup: View {
     @Environment(\.dismiss) var dismiss
-
+    
+    let auth: AuthService
+    
     // Form Inputs
     @State private var email = ""
     @State private var firstName = ""
     @State private var lastName = ""
     @State private var password = ""
     @State private var confirmPassword = ""
-
+    
     // Computed property to validate inputs
     private var isFormValid: Bool {
         !email.isEmpty && !password.isEmpty && password == confirmPassword
-            && password.count >= 6
+        && password.count >= 6
     }
-
+    
     @State private var successMsg: String = ""
-    @State private var success : Bool = false
-
+    @State private var success: Bool = false
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
@@ -33,7 +35,7 @@ struct RegisterPopup: View {
                     .font(.title)
                     .bold()
                     .padding(.top)
-
+                
                 // Form Fields
                 VStack(spacing: 16) {
                     CustomTextField(
@@ -43,7 +45,7 @@ struct RegisterPopup: View {
                     )
                     .textContentType(.givenName)
                     .autocapitalization(.none)
-
+                    
                     CustomTextField(
                         placeholder: "Last Name",
                         text: $lastName,
@@ -51,7 +53,7 @@ struct RegisterPopup: View {
                     )
                     .textContentType(.familyName)
                     .autocapitalization(.none)
-
+                    
                     CustomTextField(
                         placeholder: "Email Address",
                         text: $email,
@@ -59,7 +61,7 @@ struct RegisterPopup: View {
                     )
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
-
+                    
                     CustomTextField(
                         placeholder: "Password (min 6 chars)",
                         text: $password,
@@ -78,15 +80,18 @@ struct RegisterPopup: View {
                     .autocorrectionDisabled()
                 }
                 .padding(.horizontal)
-
+                
                 // Submit Button
                 Button(action: {
                     
                     Task {
                         do {
-                            success = try await registerUser()
-                            dismiss()  // Automatically dismisses the popup on success
-                            successMsg = "Registration Successful"
+                            try await auth.register(
+                                email: email,
+                                firstName: firstName,
+                                lastName: lastName,
+                                password: password
+                            )
                         } catch {
                             successMsg = "Registration Failed : \(error)"
                         }
@@ -99,22 +104,22 @@ struct RegisterPopup: View {
                         .padding()
                         .background(isFormValid ? Color.blue : Color.gray)
                         .cornerRadius(10)
-
+                    
                 }
                 .disabled(!isFormValid)
                 .padding(.horizontal)
                 .padding(.top, 10)
                 
-                Text (successMsg)
+                Text(successMsg)
                     .font(.headline)
                     .foregroundColor(success ? .green : .red)
                     .frame(maxWidth: .infinity, maxHeight: 64)
                     .cornerRadius(8)
                     .padding()
-
+                
                 Spacer()
             }
-
+            
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Cancel") {
@@ -124,93 +129,19 @@ struct RegisterPopup: View {
             }
         }
     }
-
-    func registerUser() async throws -> Bool {
-        let endpoint = ProcessInfo.processInfo.environment["REGISTER_URL"]
-        guard let url = URL(string: endpoint ?? "") else {
-            throw LoginError.invalidUrl
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let encoder = JSONEncoder()
-        encoder.keyEncodingStrategy = .convertToSnakeCase
-        let loginData = try encoder.encode(
-            RegisterUser(
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                password: password
-            )
-        )
-
-        request.httpBody = loginData
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw RegisterError.invalidResponse
-        }
-        print("Login response status: \(httpResponse.statusCode)")
-
-        guard (200..<300).contains(httpResponse.statusCode) else {
-            let decoder = JSONDecoder()
-            let loginError = try decoder.decode(RegisterUser.self, from: data)
-            print(response)
-            throw RegisterError.requestFailed(
-                statusCode: httpResponse.statusCode
-            )
-        }
-        guard !data.isEmpty else {
-            throw RegisterError.emptyResponse
-        }
-
-        return true
-    }
 }
 
-// MARK: - Reusable Custom Input Component
-struct CustomTextField: View {
-    var placeholder: String
-    @Binding var text: String
-    var isSecure: Bool
 
-    var body: some View {
-        Group {
-            if isSecure {
-                SecureField(placeholder, text: $text)
-            } else {
-                TextField(placeholder, text: $text)
-            }
-        }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(8)
-        .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Color(.systemGray4), lineWidth: 1)
-        )
-    }
-}
 
-struct RegisterUser: Codable {
-    let firstName: String?
-    let lastName: String?
-    let email: String?
-    let password: String?
-}
-
-enum RegisterError: Error {
-    case invalidUrl
-    case invalidResponse
-    case requestFailed(statusCode: Int)
-    case emptyResponse
-    case invalidData
-
-}
 
 #Preview {
-    RegisterPopup()
+    RegisterPopup(
+        auth: AuthService(
+            client: Client(
+                baseURL: URL(
+                    string: "http://localhost:3000"
+                )!
+            )
+        )
+    )
 }

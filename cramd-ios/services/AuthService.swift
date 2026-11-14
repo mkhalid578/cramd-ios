@@ -7,20 +7,15 @@
 
 import Foundation
 
-@MainActor
-final class AuthService {
-    private var client: Client
-
-    init(baseURL: URL) {
-        self.client = Client(baseURL: baseURL)
-    }
+struct AuthService {
+    let client: Client
 
     func login(email: String, password: String) async throws -> LoginResponse {
         let response: LoginResponse = try await client.post(
             path: ["auth", "login"],
             body: LoginRequest(email: email, password: password)
         )
-        client.setToken(token: response.token ?? "")
+        await client.setToken(token: response.token ?? "")
         return response
     }
     
