@@ -15,7 +15,6 @@ struct CarView: View {
     @State var selectedCar: Car?
 
     var body: some View {
-        UserBar(user: $user)
 
         NavigationStack {
 

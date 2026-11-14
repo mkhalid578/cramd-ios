@@ -10,24 +10,17 @@ struct ContentView: View {
     )
 
     var body: some View {
-        VStack(spacing: 8) {
 
-            if localUser?.token != nil {
-                CarView(
-                    carService: appServices.cars,
-                    user: $localUser
-                )
+        if localUser?.token != nil {
 
-            } else {
-                LoginView(
-                    authService: appServices.auth,
-                    activeUser: $localUser
-                )
-            }
+            HomePage( activeUser: $localUser, carService: appServices.cars)
+        } else {
 
-            Spacer()
+            LoginView(
+                authService: appServices.auth,
+                activeUser: $localUser
+            )
         }
-        .padding()
     }
 }
 
